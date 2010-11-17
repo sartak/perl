@@ -127,4 +127,24 @@ sub samepath {
     }
 }
 
+sub strip_pod {
+    my ($file) = @_;
+    require Pod::Simple;
+    my $p = Pod::Simple->new;
+    $p->code_handler(
+        sub {
+            print {$_[2]{output_fh}} $_[0],"\n";
+            return;
+        }
+    );
+    my $result;
+    $p->output_string( \$result );
+    $p->parse_file($file);
+    unlink($file);
+    open my $out_fh, ">", $file;
+    print $out_fh $result;
+    close $out_fh;
+    return;
+}
+
 1;
