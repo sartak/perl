@@ -1066,6 +1066,9 @@ install-verbose:
 install-silent:
 	$(MAKE) install.perl install.man STRIPFLAGS=$(STRIPFLAGS) INSTALLFLAGS=-S DESTDIR="$(DESTDIR)"
 
+install-stripped:
+	$(MAKE) install.perl STRIPFLAGS=$(STRIPFLAGS) INSTALLFLAGS="-s -P -p" DESTDIR="$(DESTDIR)"
+
 no-install:
 	$(MAKE) install.perl install.man STRIPFLAGS=$(STRIPFLAGS) INSTALLFLAGS=-n DESTDIR="$(DESTDIR)"
 
