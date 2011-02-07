@@ -1,16 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    require './test.pl';
-}
-
-use strict;
-use warnings;
-use Config;
-
-BEGIN {
     if (!-c "/dev/null") {
 	print "1..0 # Skip: no /dev/null\n";
 	exit 0;
@@ -27,7 +17,9 @@ my $dev_tty = '/dev/tty';
     }
 }
 
-plan(9);
+use Test::More tests => 11;
+use Test::PerlRun;
+use Config;
 
 sub rc {
     open RC, ">", ".perldb" or die $!;
@@ -62,7 +54,7 @@ rc(
 
 {
     local $ENV{PERLDB_OPTS} = "ReadLine=0";
-    runperl(switches => [ '-d' ], progfile => $target);
+    perlrun_stdout_is({switches => '-d', file => $target}, '');
 }
 
 my $contents;
@@ -79,34 +71,37 @@ like($contents, qr/sub factorial/,
 
 {
     local $ENV{PERLDB_OPTS} = "ReadLine=0";
-    my $output = runperl(switches => [ '-d' ], progfile => '../lib/perl5db/t/lvalue-bug');
-    like($output, qr/foo is defined/, 'lvalue subs work in the debugger');
+    perlrun_stdout_like({switches => '-d',
+			 file => '../lib/perl5db/t/lvalue-bug'},
+			qr/foo is defined/,
+			'lvalue subs work in the debugger');
 }
 
 {
     local $ENV{PERLDB_OPTS} = "ReadLine=0 NonStop=1";
-    my $output = runperl(switches => [ '-d' ], progfile => '../lib/perl5db/t/symbol-table-bug');
-    like($output, qr/Undefined symbols 0/, 'there are no undefined values in the symbol table');
+    perlrun_stdout_like({switches => '-d',
+			 file => '../lib/perl5db/t/symbol-table-bug'},
+			qr/Undefined symbols 0/,
+			'there are no undefined values in the symbol table');
 }
 
 SKIP: {
-    if ( $Config{usethreads} ) {
-        skip('This perl has threads, skipping non-threaded debugger tests');
-    } else {
-        my $error = 'This Perl not built to support threads';
-        my $output = runperl( switches => [ '-dt' ], stderr => 1 );
-        like($output, qr/$error/, 'Perl debugger correctly complains that it was not built with threads');
-    }
-
+    skip('This perl has threads, skipping non-threaded debugger tests', 1)
+	if $Config{usethreads};
+    perlrun_stderr_like({switches => '-dt', code => 0},
+			qr/This Perl not built to support threads/,
+			'Perl debugger correctly complains that it was not built with threads');
 }
+
 SKIP: {
-    if ( $Config{usethreads} ) {
-        local $ENV{PERLDB_OPTS} = "ReadLine=0 NonStop=1";
-        my $output = runperl(switches => [ '-dt' ], progfile => '../lib/perl5db/t/symbol-table-bug');
-        like($output, qr/Undefined symbols 0/, 'there are no undefined values in the symbol table when running with thread support');
-    } else {
-        skip("This perl is not threaded, skipping threaded debugger tests");
-    }
+    skip("This perl is not threaded, skipping threaded debugger tests", 1)
+	unless $Config{usethreads};
+
+    local $ENV{PERLDB_OPTS} = "ReadLine=0 NonStop=1";
+    perlrun_stdout_like({switches => '-dt',
+			 file => '../lib/perl5db/t/symbol-table-bug'},
+			qr/Undefined symbols 0/,
+			'there are no undefined values in the symbol table when running with thread support');
 }
 
 
@@ -126,7 +121,8 @@ SKIP: {
         }\n|,
     );
 
-    my $output = runperl(switches => [ '-d' ], stderr => 1, progfile => '../lib/perl5db/t/rt-61222');
+    perlrun_exit_status_is({switches => '-d', file => '../lib/perl5db/t/rt-61222'},
+			   0, 'Program exits cleanly');
     my $contents;
     {
         local $/;
@@ -155,26 +151,25 @@ SKIP: {
         }\n|,
     );
 
-    my $output = runperl(switches => [ '-d' ], stderr => 1, progfile => '../lib/perl5db/t/proxy-constants');
-    is($output, "", "proxy constant subroutines");
+    perlrun_stderr_is({switches => '-d', file => '../lib/perl5db/t/proxy-constants'},
+		       "", "proxy constant subroutines");
 }
 
 
 # [perl #66110] Call a subroutine inside a regex
 {
     local $ENV{PERLDB_OPTS} = "ReadLine=0 NonStop=1";
-    my $output = runperl(switches => [ '-d' ], stderr => 1, progfile => '../lib/perl5db/t/rt-66110');
-    like($output, "All tests successful.", "[perl #66110]");
+    perlrun_stdout_like({switches => '-d', file => '../lib/perl5db/t/rt-66110'},
+			qr/All tests successful\./, "[perl #66110]");
 }
 
 # taint tests
 
 {
     local $ENV{PERLDB_OPTS} = "ReadLine=0 NonStop=1";
-    my $output = runperl(switches => [ '-d', '-T' ], stderr => 1,
-			progfile => '../lib/perl5db/t/taint');
-    chomp $output if $^O eq 'VMS'; # newline guaranteed at EOF
-    is($output, '[$^X][done]', "taint");
+    perlrun_stdout_like({switches => [ '-d', '-T', '-I../lib' ],
+			 file => '../lib/perl5db/t/taint'},
+			qr/^\[\$\^X]\[done]$/, "taint");
 }
 
 
