@@ -9,7 +9,7 @@ use ExtUtils::CBuilder;
 use attributes;
 use overload;
 
-plan tests => 25;
+plan tests => 28;
 
 my ($source_file, $obj_file, $lib_file);
 
@@ -43,7 +43,7 @@ SKIP: {
 }
 
 SKIP: {
-  skip "no dynamic loading", 21
+  skip "no dynamic loading", 24
     if !$b->have_compiler || !$Config{usedl};
   my $module = 'XSMore';
   $lib_file = $b->link( objects => $obj_file, module_name => $module );
@@ -101,6 +101,11 @@ SKIP: {
       }
     }
   }
+
+  # Tests for embedded typemaps
+  is XSMore::typemaptest1(), 42, 'Simple embedded typemap works';
+  is XSMore::typemaptest2(), 42, 'Simple embedded typemap works with funny end marker';
+  is XSMore::typemaptest3(12), 12, 'Simple embedded typemap works for input, too';
 }
 
 unless ($ENV{PERL_NO_CLEANUP}) {
