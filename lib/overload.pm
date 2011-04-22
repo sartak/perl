@@ -940,14 +940,17 @@ ancestor is used, but this is accidental and subject to change.
 
 =head2 Run-time Overloading
 
-Since all C<use> directives are executed at compile-time, the only way to
-change overloading during run-time is to
+Since all C<use> directives are executed at compile-time, one way to
+change overloading during run-time is to call C<import> manually
 
-    eval 'use overload "+" => \&addmethod';
+    my $addmethod = sub { ... };
+    require overload;
+    overload->import("+" => $addmethod);
 
-You can also use
+You can also remove overloading at runtime by using
 
-    eval 'no overload "+", "--", "<="';
+    require overload;
+    overload->unimport("+", "--", "<=");
 
 though the use of these constructs during run-time is questionable.
 
