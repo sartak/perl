@@ -694,3 +694,10 @@ tr/a/b/r;
 ####
 # y/uni/code/
 tr/\x{345}/\x{370}/;
+####
+# aelemfast
+$b::a[0] = 1;
+####
+# aelemfast for a lexical
+my @a;
+$a[0] = 1;

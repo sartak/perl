@@ -35,6 +35,7 @@
 #define Perl_pp_hex Perl_pp_oct
 #define Perl_pp_rindex Perl_pp_index
 #define Perl_pp_lcfirst Perl_pp_ucfirst
+#define Perl_pp_aelemfast_lex Perl_pp_aelemfast
 #define Perl_pp_avalues Perl_pp_akeys
 #define Perl_pp_values Perl_do_kv
 #define Perl_pp_keys Perl_do_kv
@@ -273,6 +274,7 @@ EXTCONST char* const PL_op_name[] = {
 	"quotemeta",
 	"rv2av",
 	"aelemfast",
+	"aelemfast_lex",
 	"aelem",
 	"aslice",
 	"aeach",
@@ -650,6 +652,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"quotemeta",
 	"array dereference",
 	"constant array element",
+	"constant lexical array element",
 	"array element",
 	"array slice",
 	"each on array",
@@ -1041,6 +1044,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	Perl_pp_quotemeta,
 	Perl_pp_rv2av,
 	Perl_pp_aelemfast,
+	Perl_pp_aelemfast_lex,	/* implemented by Perl_pp_aelemfast */
 	Perl_pp_aelem,
 	Perl_pp_aslice,
 	Perl_pp_aeach,
@@ -1429,6 +1433,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	Perl_ck_fun,		/* quotemeta */
 	Perl_ck_rvconst,	/* rv2av */
 	Perl_ck_null,		/* aelemfast */
+	Perl_ck_null,		/* aelemfast_lex */
 	Perl_ck_null,		/* aelem */
 	Perl_ck_null,		/* aslice */
 	Perl_ck_each,		/* aeach */
@@ -1811,6 +1816,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00009b8e,	/* quotemeta */
 	0x00000148,	/* rv2av */
 	0x00013604,	/* aelemfast */
+	0x00013040,	/* aelemfast_lex */
 	0x00013204,	/* aelem */
 	0x00023401,	/* aslice */
 	0x00003b00,	/* aeach */
