@@ -4301,6 +4301,13 @@ EXTCONST char PL_no_localize_ref[]
 EXTCONST char PL_memory_wrap[]
   INIT("panic: memory wrap");
 
+EXTCONST char PL_Yes[]
+  INIT("1");
+EXTCONST char PL_No[]
+  INIT("");
+EXTCONST char PL_hexdigit[]
+  INIT("0123456789abcdef0123456789ABCDEF");
+
 #ifdef CSH
 EXTCONST char PL_cshname[]
   INIT(CSH);
@@ -4982,7 +4989,6 @@ struct interpreter {
 #  define PERLVARA(var,n,type) type var[n];
 #  define PERLVARI(var,type,init) type var;
 #  define PERLVARIC(var,type,init) type var;
-#  define PERLVARISC(var,init) const char var[sizeof(init)];
 
 struct interpreter {
 #  include "intrpvar.h"
@@ -5018,7 +5024,6 @@ struct perl_vars *PL_VarsPtr;
 #  undef PERLVARA
 #  undef PERLVARI
 #  undef PERLVARIC
-#  undef PERLVARISC
 
 #endif /* MULTIPLICITY */
 
@@ -5069,7 +5074,6 @@ struct tempsym; /* defined in pp_pack.c */
 #define PERLVARA(var,n,type) EXT type PL_##var[n];
 #define PERLVARI(var,type,init) EXT type  PL_##var INIT(init);
 #define PERLVARIC(var,type,init) EXTCONST type PL_##var INIT(init);
-#define PERLVARISC(var,init) EXTCONST char PL_##var[sizeof(init)] INIT(init);
 
 #if !defined(MULTIPLICITY)
 START_EXTERN_C
