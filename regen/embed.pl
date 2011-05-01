@@ -633,8 +633,10 @@ print $em <<'END';
 END
 
 for $sym (sort keys %globvar) {
+    print $em "#ifdef OS2\n" if $sym eq 'sh_path';
     print $em multon($sym,   'G','my_vars->');
     print $em multon("G$sym",'', 'my_vars->');
+    print $em "#endif\n" if $sym eq 'sh_path';
 }
 
 print $em <<'END';
@@ -644,7 +646,9 @@ print $em <<'END';
 END
 
 for $sym (sort keys %globvar) {
+    print $em "#ifdef OS2\n" if $sym eq 'sh_path';
     print $em multoff($sym,'G');
+    print $em "#endif\n" if $sym eq 'sh_path';
 }
 
 print $em <<'END';
