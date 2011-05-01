@@ -38,14 +38,17 @@ ppaddr
 regkind
 reg_name
 reg_extflags_name
+revision
 sig_name
 sig_num
 simple
 simple_bitmask
+subversion
 utf8skip
 uuemap
 varies
 varies_bitmask
+version
 vtbl_amagic
 vtbl_amagicelem
 vtbl_arylen
