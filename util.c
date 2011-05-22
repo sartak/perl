@@ -838,6 +838,7 @@ Perl_screaminstr(pTHX_ SV *bigstr, SV *littlestr, I32 start_shift, I32 end_shift
 
     assert(SvTYPE(littlestr) == SVt_PVGV);
     assert(SvVALID(littlestr));
+    assert(SvSCREAM(bigstr));
 
     if (*old_posp == -1
 	? (pos = PL_screamfirst[BmRARE(littlestr)]) < 0

@@ -692,6 +692,11 @@ Perl_re_intuit_start(pTHX_ REGEXP * const rx, SV *sv, char *strpos,
             (IV)prog->check_end_shift);
     });       
         
+    if (flags & REXEC_SCREAM)
+	assert(SvSCREAM(sv));
+    else
+	assert(!SvSCREAM(sv));
+    
     if (flags & REXEC_SCREAM) {
 	I32 p = -1;			/* Internal iterator of scream. */
 	I32 * const pp = data ? data->scream_pos : &p;
@@ -2289,6 +2294,10 @@ Perl_regexec_flags(pTHX_ REGEXP * const rx, char *stringarg, register char *stre
 	scream_pos = -1;
 	dontbother = end_shift;
 	strend = HOPc(strend, -dontbother);
+	if (flags & REXEC_SCREAM)
+	    assert(SvSCREAM(sv));
+	else
+	    assert(!SvSCREAM(sv));
 	while ( (s <= last) &&
 		((flags & REXEC_SCREAM)
 		 ? (s = screaminstr(sv, must, HOP3c(s, back_min, (back_min<0 ? strbeg : strend)) - strbeg,
@@ -2297,6 +2306,10 @@ Perl_regexec_flags(pTHX_ REGEXP * const rx, char *stringarg, register char *stre
 				  (unsigned char*)strend, must,
 				  multiline ? FBMrf_MULTILINE : 0))) ) {
 	    /* we may be pointing at the wrong string */
+	    if (flags & REXEC_SCREAM)
+		assert(SvSCREAM(sv));
+	    else
+		assert(!SvSCREAM(sv));
 	    if ((flags & REXEC_SCREAM) && RXp_MATCH_COPIED(prog))
 		s = strbeg + (s - SvPVX_const(sv));
 	    DEBUG_EXECUTE_r( did_match = 1 );
@@ -2369,6 +2382,10 @@ Perl_regexec_flags(pTHX_ REGEXP * const rx, char *stringarg, register char *stre
 		utf8_target ? to_utf8_substr(prog) : to_byte_substr(prog);
 	    float_real = utf8_target ? prog->float_utf8 : prog->float_substr;
 
+	    if (flags & REXEC_SCREAM)
+		assert(SvSCREAM(sv));
+	    else
+		assert(!SvSCREAM(sv));
 	    if (flags & REXEC_SCREAM) {
 		last = screaminstr(sv, float_real, s - strbeg,
 				   end_shift, &scream_pos, 1); /* last one */
