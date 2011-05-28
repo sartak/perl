@@ -6364,6 +6364,8 @@ S_add_cp_to_invlist(pTHX_ HV* invlist, const UV cp) {
     return add_range_to_invlist(invlist, cp, cp);
 }
 
+#undef INVLIST_INITIAL_LENGTH
+
 /* End of inversion list object */
 
 /*
