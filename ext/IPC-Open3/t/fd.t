@@ -14,7 +14,7 @@ BEGIN {
 use strict;
 use warnings;
 
-plan 1;
+plan 3;
 
 # [perl #76474]
 {
@@ -26,4 +26,23 @@ plan 1;
 
   is $stderr, '',
    "dup STDOUT in a child process by using its file descriptor";
+}
+
+{
+  open my $fh, '<', 'Makefile' or die "Can't open MAKEFILE: $!";
+  my $want = <$fh>;
+  is($want, "# This Makefile is for the IPC::Open3 extension to perl.\n",
+     'No surprises from MakeMaker');
+  close $fh;
+
+  fresh_perl_is(<<'EOP',
+use IPC::Open3;
+open FOO, 'Makefile' or die $!;
+open3('<&' . fileno FOO, my $out, undef, $ENV{PERLEXE}, '-eprint scalar <STDIN>');
+print <$out>;
+EOP
+		$want,
+		undef,
+		'Numeric file handles are duplicated correctly'
+	     );
 }
